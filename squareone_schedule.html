@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SquareOne Event Schedule</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --gold: #c9a84c;
+      --gold-light: #f0d070;
+      --navy: #0b0f1c;
+      --navy-2: #0e1328;
+      --navy-3: #131828;
+      --navy-4: #1a2040;
+      --cream: #f0e6cc;
+      --cream-dim: #a89878;
+      --border: rgba(201,168,76,0.15);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--navy);
+      color: var(--cream);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── STAR FIELD ── */
+    .stars {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+    .star {
+      position: absolute;
+      border-radius: 50%;
+      background: #fff;
+      animation: twinkle var(--d) ease-in-out infinite alternate;
+      opacity: 0;
+    }
+    @keyframes twinkle {
+      from { opacity: 0; transform: scale(0.6); }
+      to   { opacity: var(--o); transform: scale(1); }
+    }
+
+    /* ── HEADER ── */
+    header {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      padding: 72px 24px 56px;
+      background: linear-gradient(180deg, #09102a 0%, transparent 100%);
+    }
+
+    .header-decor {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+    .header-decor-line {
+      flex: 1;
+      max-width: 160px;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--gold));
+    }
+    .header-decor-line.right {
+      background: linear-gradient(90deg, var(--gold), transparent);
+    }
+    .header-decor-diamond {
+      width: 8px; height: 8px;
+      background: var(--gold);
+      transform: rotate(45deg);
+      flex-shrink: 0;
+    }
+
+    header h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(38px, 7vw, 72px);
+      font-weight: 700;
+      color: var(--cream);
+      letter-spacing: 0.04em;
+      line-height: 1;
+      margin-bottom: 12px;
+      text-shadow: 0 0 60px rgba(201,168,76,0.25);
+    }
+
+    header h1 span {
+      color: var(--gold);
+    }
+
+    .tagline {
+      font-size: clamp(11px, 1.5vw, 13px);
+      font-weight: 500;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--cream-dim);
+      margin-bottom: 8px;
+    }
+
+    .year-badge {
+      display: inline-block;
+      margin-top: 20px;
+      padding: 5px 18px;
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      font-size: 12px;
+      letter-spacing: 0.15em;
+      color: var(--gold);
+      background: rgba(201,168,76,0.06);
+    }
+
+    /* ── MAIN ── */
+    main {
+      position: relative;
+      z-index: 1;
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 0 20px 100px;
+    }
+
+    .section-head {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+    .section-head-line {
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+    .section-head span {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--gold);
+      white-space: nowrap;
+    }
+
+    /* ── TABLE ── */
+    .table-shell {
+      border-radius: 14px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      box-shadow: 0 0 80px rgba(201,168,76,0.04), 0 24px 60px rgba(0,0,0,0.5);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    thead tr {
+      background: var(--navy-4);
+    }
+
+    thead th {
+      padding: 16px 20px;
+      text-align: left;
+      font-size: 10.5px;
+      font-weight: 600;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--gold);
+      border-bottom: 1px solid var(--border);
+    }
+
+    tbody tr {
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      transition: background 0.18s;
+      cursor: default;
+    }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: rgba(201,168,76,0.04); }
+
+    /* date grouping: first row of a new date gets a top accent */
+    tbody tr.date-first td:first-child::before {
+      content: '';
+      display: block;
+      width: 2px;
+      height: 100%;
+      background: var(--gold);
+      position: absolute;
+      left: 0; top: 0;
+    }
+
+    td {
+      padding: 16px 20px;
+      vertical-align: top;
+      font-size: 14px;
+      line-height: 1.5;
+      position: relative;
+    }
+
+    .td-date {
+      white-space: nowrap;
+      font-weight: 600;
+      color: var(--cream);
+      font-size: 13.5px;
+    }
+    .td-date .date-num {
+      display: block;
+      font-family: 'Playfair Display', serif;
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--gold-light);
+      line-height: 1;
+      margin-bottom: 2px;
+    }
+    .td-date .date-month {
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--cream-dim);
+    }
+
+    .td-day {
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      color: var(--cream-dim);
+      text-transform: uppercase;
+      white-space: nowrap;
+      padding-top: 20px;
+    }
+
+    .td-event {
+      font-weight: 600;
+      color: var(--cream);
+      font-size: 15px;
+    }
+
+    .td-venue {
+      color: var(--cream-dim);
+      font-size: 13px;
+    }
+    .td-venue .venue-tag {
+      display: inline-block;
+      background: rgba(201,168,76,0.1);
+      border: 1px solid rgba(201,168,76,0.2);
+      border-radius: 4px;
+      padding: 2px 8px;
+      font-size: 12px;
+      color: var(--gold);
+      margin: 2px 2px 2px 0;
+    }
+
+    .td-time {
+      white-space: nowrap;
+      font-size: 13px;
+      color: var(--cream-dim);
+      font-variant-numeric: tabular-nums;
+    }
+    .td-time .time-slot {
+      display: block;
+      color: var(--cream);
+      font-weight: 500;
+    }
+    .td-time .time-slot + .time-slot {
+      margin-top: 4px;
+      padding-top: 4px;
+      border-top: 1px solid var(--border);
+    }
+
+    /* highlight Sunday events */
+    tbody tr.weekend td { background: rgba(255,255,255,0.01); }
+
+    /* ── FOOTER ── */
+    footer {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      padding-bottom: 40px;
+    }
+    .footer-decor {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+    .footer-decor-line {
+      width: 60px; height: 1px;
+      background: linear-gradient(90deg, transparent, var(--border));
+    }
+    .footer-decor-line.right {
+      background: linear-gradient(90deg, var(--border), transparent);
+    }
+    footer p {
+      font-size: 12px;
+      color: #2e3450;
+      letter-spacing: 0.1em;
+    }
+
+    @media (max-width: 640px) {
+      .table-shell { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+      table { min-width: 560px; }
+      td { padding: 12px 10px; font-size: 13px; }
+      thead th { padding: 12px 10px; font-size: 10px; }
+      .td-date .date-num { font-size: 18px; }
+      .venue-tag { font-size: 11px; }
+      .td-time { font-size: 12px; }
+      .td-event { font-size: 13px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- star field -->
+  <div class="stars" id="stars"></div>
+
+  <header>
+    <div class="header-decor">
+      <div class="header-decor-line"></div>
+      <div class="header-decor-diamond"></div>
+      <div class="header-decor-line right"></div>
+    </div>
+    <p class="tagline">Welcome to</p>
+    <h1>SquareOne</h1>
+    <p class="tagline" style="margin-top:10px;">Induction Event Schedule</p>
+    <div class="year-badge">July – August 2025</div>
+  </header>
+
+  <main>
+    <div class="section-head">
+      <div class="section-head-line"></div>
+      <span>Programme of Events</span>
+      <div class="section-head-line"></div>
+    </div>
+
+    <div class="table-shell">
+      <table>
+        <colgroup>
+          <col style="width:10%">
+          <col style="width:9%">
+          <col style="width:26%">
+          <col style="width:33%">
+          <col style="width:22%">
+        </colgroup>
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Day</th>
+            <th>Event</th>
+            <th>Venue</th>
+            <th>Time</th>
+          </tr>
+        </thead>
+        <tbody>
+
+          <tr>
+            <td class="td-date">
+              <span class="date-num">16</span>
+              <span class="date-month">July</span>
+            </td>
+            <td class="td-day">Thu</td>
+            <td class="td-event">SQ1 Intro</td>
+            <td class="td-venue"><span class="venue-tag">Audi</span></td>
+            <td class="td-time"><span class="time-slot">6:00 PM – 7:30 PM</span></td>
+          </tr>
+
+          <tr>
+            <td class="td-date">
+              <span class="date-num">17</span>
+              <span class="date-month">July</span>
+            </td>
+            <td class="td-day">Fri</td>
+            <td class="td-event">IceBreakers</td>
+            <td class="td-venue">
+              <span class="venue-tag">E201</span>
+              <span class="venue-tag">E202</span>
+              <span class="venue-tag">E211</span>
+              <span class="venue-tag">E210</span>
+            </td>
+            <td class="td-time"><span class="time-slot">5:00 PM – 8:00 PM</span></td>
+          </tr>
+
+          <tr>
+            <td class="td-date">
+              <span class="date-num">18</span>
+              <span class="date-month">July</span>
+            </td>
+            <td class="td-day">Sat</td>
+            <td class="td-event">Karaoke Night</td>
+            <td class="td-venue">
+              <span class="venue-tag">Audi</span>
+              <span style="font-size:11px;color:var(--cream-dim);display:block;margin-top:4px;">or Open Area</span>
+            </td>
+            <td class="td-time"><span class="time-slot">8:30 PM – 10:30 PM</span></td>
+          </tr>
+
+          <tr class="weekend">
+            <td class="td-date">
+              <span class="date-num">19</span>
+              <span class="date-month">July</span>
+            </td>
+            <td class="td-day">Sun</td>
+            <td class="td-event">Dual Boot</td>
+            <td class="td-venue">
+              <span class="venue-tag">E201</span>
+              <span class="venue-tag">E202</span>
+            </td>
+            <td class="td-time">
+              <span class="time-slot">10:00 AM – 1:00 PM</span>
+              <span class="time-slot">7:00 PM – 8:30 PM</span>
+            </td>
+          </tr>
+
+          <tr class="weekend">
+            <td class="td-date">
+              <span class="date-num">19</span>
+              <span class="date-month">July</span>
+            </td>
+            <td class="td-day">Sun</td>
+            <td class="td-event">Club Intro</td>
+            <td class="td-venue"><span class="venue-tag">Audi</span></td>
+            <td class="td-time"><span class="time-slot">2:00 PM – 6:00 PM</span></td>
+          </tr>
+
+          <tr>
+            <td class="td-date">
+              <span class="date-num">20</span>
+              <span class="date-month">July</span>
+            </td>
+            <td class="td-day">Mon</td>
+            <td class="td-event">Esports Events</td>
+            <td class="td-venue">
+              <span class="venue-tag">E201</span>
+              <span class="venue-tag">E202</span>
+              <span class="venue-tag">E211</span>
+              <span class="venue-tag">E210</span>
+            </td>
+            <td class="td-time"><span class="time-slot">8:30 PM – 11:30 PM</span></td>
+          </tr>
+
+          <tr>
+            <td class="td-date">
+              <span class="date-num">23</span>
+              <span class="date-month">July</span>
+            </td>
+            <td class="td-day">Thu</td>
+            <td class="td-event">Megabyte Show</td>
+            <td class="td-venue"><span class="venue-tag">Audi</span></td>
+            <td class="td-time"><span class="time-slot">5:00 PM – 10:00 PM</span></td>
+          </tr>
+
+          <tr>
+            <td class="td-date">
+              <span class="date-num">24</span>
+              <span class="date-month">July</span>
+            </td>
+            <td class="td-day">Fri</td>
+            <td class="td-event">Freshie Fest</td>
+            <td class="td-venue">
+              <span class="venue-tag">Audi</span>
+              <span style="font-size:11px;color:var(--cream-dim);display:block;margin-top:4px;">+ Open Area outside Audi</span>
+            </td>
+            <td class="td-time"><span class="time-slot">8:00 PM – 11:30 PM</span></td>
+          </tr>
+
+          <tr>
+            <td class="td-date">
+              <span class="date-num">2</span>
+              <span class="date-month">August</span>
+            </td>
+            <td class="td-day">Sun</td>
+            <td class="td-event">Senior–Junior Interaction</td>
+            <td class="td-venue">
+              <span class="venue-tag">E201</span>
+              <span class="venue-tag">E202</span>
+            </td>
+            <td class="td-time"><span class="time-slot">9:00 PM – 11:00 PM</span></td>
+          </tr>
+
+        </tbody>
+      </table>
+    </div>
+  </main>
+
+  <footer>
+    <div class="footer-decor">
+      <div class="footer-decor-line"></div>
+      <div class="header-decor-diamond" style="width:6px;height:6px;background:var(--border)"></div>
+      <div class="footer-decor-line right"></div>
+    </div>
+    <p>SquareOne Induction &nbsp;·&nbsp; 2025</p>
+  </footer>
+
+  <script>
+    // generate star field
+    const container = document.getElementById('stars');
+    for (let i = 0; i < 120; i++) {
+      const s = document.createElement('div');
+      s.className = 'star';
+      const size = Math.random() * 1.8 + 0.4;
+      s.style.cssText = `
+        width:${size}px; height:${size}px;
+        top:${Math.random()*100}%;
+        left:${Math.random()*100}%;
+        --d:${(Math.random()*4+2).toFixed(1)}s;
+        --o:${(Math.random()*0.5+0.1).toFixed(2)};
+        animation-delay:${(Math.random()*5).toFixed(1)}s;
+      `;
+      container.appendChild(s);
+    }
+  </script>
+
+</body>
+</html>
