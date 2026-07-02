@@ -234,6 +234,16 @@
       padding-top: 20px;
     }
 
+    /* day-of-week shown inline under the date, mobile only */
+    .date-day-mobile {
+      display: none;
+    }
+
+    /* time shown under the event name, mobile only */
+    .event-time-mobile {
+      display: none;
+    }
+
     .td-event {
       font-weight: 600;
       color: var(--cream);
@@ -304,13 +314,61 @@
 
     @media (max-width: 640px) {
       .table-shell { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-      table { min-width: 560px; }
       td { padding: 12px 10px; font-size: 13px; }
       thead th { padding: 12px 10px; font-size: 10px; }
       .td-date .date-num { font-size: 18px; }
       .venue-tag { font-size: 11px; }
       .td-time { font-size: 12px; }
       .td-event { font-size: 13px; }
+    }
+
+    /* below this width the full 5-column table would need side-scrolling,
+       so collapse it down to 3 real columns: Date, Event (with Time folded
+       underneath), and Venue */
+    @media (max-width: 500px) {
+      colgroup col:nth-child(1) { width: 26% !important; }
+      colgroup col:nth-child(2) { width: 0 !important; }
+      colgroup col:nth-child(3) { width: 42% !important; }
+      colgroup col:nth-child(4) { width: 32% !important; }
+      colgroup col:nth-child(5) { width: 0 !important; }
+
+      thead th:nth-child(2),
+      tbody td.td-day,
+      thead th:nth-child(5),
+      tbody td.td-time {
+        display: none;
+      }
+
+      .td-date { padding-right: 6px; }
+
+      .date-day-mobile {
+        display: block;
+        margin-top: 3px;
+        font-size: 10px;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--gold);
+      }
+
+      .td-event { padding-right: 8px; }
+
+      .event-time-mobile {
+        display: block;
+        margin-top: 4px;
+        font-size: 11px;
+        font-weight: 400;
+        color: var(--cream-dim);
+        font-variant-numeric: tabular-nums;
+      }
+      .event-time-mobile .time-slot {
+        display: block;
+        color: var(--cream-dim);
+        font-weight: 400;
+        border-top: none !important;
+        padding-top: 0 !important;
+        margin-top: 2px;
+      }
     }
   </style>
 </head>
@@ -338,14 +396,12 @@
       <div class="section-head-line"></div>
     </div>
 
-    <div class="table-shell">
+    <div class="table-shell", style="width:100%">
       <table>
         <colgroup>
           <col style="width:10%">
           <col style="width:9%">
           <col style="width:26%">
-          <col style="width:33%">
-          <col style="width:22%">
         </colgroup>
         <thead>
           <tr>
@@ -836,6 +892,28 @@
   </footer>
 
   <script>
+    // fold each row's Day cell into its Date cell, and Time cell into its Event cell
+    // (used on mobile via CSS; desktop keeps the separate columns)
+    document.querySelectorAll('tbody tr').forEach(row => {
+      const dateCell = row.querySelector('.td-date');
+      const dayCell = row.querySelector('.td-day');
+      if (dateCell && dayCell) {
+        const badge = document.createElement('span');
+        badge.className = 'date-day-mobile';
+        badge.textContent = dayCell.textContent.trim();
+        dateCell.appendChild(badge);
+      }
+
+      const eventCell = row.querySelector('.td-event');
+      const timeCell = row.querySelector('.td-time');
+      if (eventCell && timeCell) {
+        const timeClone = document.createElement('div');
+        timeClone.className = 'event-time-mobile';
+        timeClone.innerHTML = timeCell.innerHTML;
+        eventCell.appendChild(timeClone);
+      }
+    });
+
     // generate star field
     const container = document.getElementById('stars');
     for (let i = 0; i < 120; i++) {
