@@ -326,11 +326,12 @@
        so collapse it down to 3 real columns: Date, Event (with Time folded
        underneath), and Venue */
     @media (max-width: 500px) {
-      colgroup col:nth-child(1) { width: 26% !important; }
-      colgroup col:nth-child(2) { width: 0 !important; }
-      colgroup col:nth-child(3) { width: 42% !important; }
-      colgroup col:nth-child(4) { width: 32% !important; }
-      colgroup col:nth-child(5) { width: 0 !important; }
+      colgroup col:nth-child(1) { width: min-content !important; }
+      colgroup col:nth-child(2) { width: auto !important; }
+      colgroup col:nth-child(3) { width: min-content !important; }
+      colgroup col:nth-child(4) { width: min-content !important; }
+      colgroup col:nth-child(5) { width: min-content !important; }
+      colgroup col:last-child {text-align:right}
 
       thead th:nth-child(2),
       tbody td.td-day,
@@ -396,12 +397,12 @@
       <div class="section-head-line"></div>
     </div>
 
-    <div class="table-shell", style="width:100%">
+    <div class="table-shell">
       <table>
         <colgroup>
-          <col style="width:10%">
-          <col style="width:9%">
-          <col style="width:26%">
+          <col>
+          <col>
+          <col>
         </colgroup>
         <thead>
           <tr>
